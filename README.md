@@ -1,6 +1,6 @@
 # PathSnap local baseline
 
-This experiment ranks directed road segments for each GPS observation. It compares a nearest-road rule with a CPU-trained logistic regression model. The saved model performs pointwise scoring. Sequence decoding is a later experiment.
+This experiment uses **scikit-learn logistic regression**, one of the examples in the hackathon guidelines' **linear and probabilistic** family. The classifier learns whether a candidate directed road segment matches a GPS observation. At prediction time, it scores each nearby segment and selects the highest-scoring one. A nearest-road rule provides the comparison. Both methods select a segment independently for each observation. Sequence decoding is a later experiment.
 
 ## Reproduce the run
 
@@ -22,13 +22,22 @@ Invoke-WebRequest https://registry.npmjs.org/leaflet/-/leaflet-1.9.4.tgz -OutFil
 .\.venv\Scripts\python.exe trip_map.py $dataset
 ```
 
-## Data and evaluation
+## Preprocessing before training
 
-1. The validation run fits 64 complete training trips and holds out 16. Trip 00000001 is reserved for the map, and a seeded draw selects the other 15. A second fit uses all 80 training trips for the 10-trip student-test comparison. Exact partitions, the archive digest, configuration, and timings are in `results/metrics.json`.
-2. GPS observations and nodes are projected to a local plane in metres. An STRtree finds directed segments within 60 m. Each observation retains up to the eight closest segments. Distance ties use arc ID. Candidate generation uses only the track and network.
-3. Each supplied route is an ordered list of traversed arcs. A separate dynamic program estimates a reference arc per GPS observation by minimizing the total point-to-segment distance with nondecreasing positions along that list. It permits skipped and repeated positions. Parallel roads, overlapping geometry, gaps and disconnected route entries can produce uncertain labels. Scores measure agreement with this alignment.
-4. Training uses observations whose estimated reference arc is in the candidate set and within 30 m. One candidate is positive and the rest are negative. The scaler is fitted only with the training rows. Features include distance, heading agreement, recent speed, segment length, and proximity to an endpoint. Heading uses only the current and preceding GPS points.
-5. Top-1 accuracy compares the selected directed arc with the estimated reference arc across **all** observations. A missing candidate counts as incorrect. Candidate macro F1 uses a 0.5 probability threshold over generated candidate rows. Candidate log loss measures binary probability quality on those same rows.
+| Step | What we did |
+| --- | --- |
+| 1. Validate each trip | Read the GPS track, road nodes, directed segments and reference route. Checked column counts, finite coordinates and timestamps, increasing timestamps, and valid node and segment IDs. |
+| 2. Convert coordinates to metres | Projected GPS points and road nodes onto a local plane centred on the trip so distances to segments could be measured in metres. |
+| 3. Find candidate roads | Used a spatial index to find segments within 60 m of each GPS point. Kept up to the eight closest, breaking distance ties by arc ID. Opposite directions on the same road can be separate candidates. |
+| 4. Estimate a training label | Trip 00000001 has 1,315 GPS points and 525 reference-route entries. To associate them, we minimized total point-to-segment distance while preserving route order and allowing skipped or repeated positions. These per-point labels are estimates and can be ambiguous where roads overlap. |
+| 5. Build and scale features | Computed seven values per candidate: distance, log-transformed distance, heading agreement, a heading-available indicator, recent speed, log-transformed segment length, and distance to the nearer endpoint. Motion uses the current and preceding GPS points. The model pipeline fits its scaler only on eligible training rows. |
+| 6. Filter training rows and split by trip | Trained on observations whose estimated reference arc appeared among the candidates and lay within 30 m. Held out 16 whole trips and fitted on 64. Then refitted on all 80 training trips for the 10-trip student-test comparison. Every evaluation observation counts, including candidate misses. |
+
+The shared [processed trip files and loading example](https://github.com/sickDoughnut-007/pathsnap-ml-hackathon/tree/main#load-a-trip) contain the features before scaling so each model can fit its own preprocessing on its training fold. The exact partitions, archive digest, configuration, and timings for this experiment are in [the run record](results/metrics.json).
+
+## Evaluation
+
+Top-1 accuracy compares the selected directed arc with the estimated reference arc across **all** observations. A missing candidate counts as incorrect. Candidate macro F1 uses a 0.5 probability threshold over generated candidate rows. Candidate log loss measures binary probability quality on those same rows.
 
 | Split | GPS observations | Nearest top-1 | Logistic top-1 | Candidate miss rate | Candidate macro F1 |
 | --- | ---: | ---: | ---: | ---: | ---: |
