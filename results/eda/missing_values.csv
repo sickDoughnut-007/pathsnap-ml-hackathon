@@ -1,0 +1,10 @@
+,student_test,train
+track_nan,0,0
+track_invalid_coord,0,0
+track_dup_timestamps,0,0
+track_non_monotonic,0,0
+track_dup_positions,0,6
+nodes_nan,0,0
+nodes_invalid_coord,0,0
+arcs_bad_node_ref,0,0
+route_bad_arc_ref,0,0

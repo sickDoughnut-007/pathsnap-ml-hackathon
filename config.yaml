@@ -1,0 +1,48 @@
+# PathSnap shared configuration.
+# Every team member must use these values so all models train on identical data.
+# Change a value only by agreement, then re-run scripts/02_build_features.py and retrain.
+
+data:
+  # Relative to the repo root. Override with --data-root or env PATHSNAP_DATA_ROOT.
+  root: "../Student folder/Student folder"
+  train_dir: train
+  student_test_dir: student_test
+
+projection:
+  # Local equirectangular (tangent-plane) projection centred on each trip's GPS centroid.
+  # Distances in metres. Max scale error is reported by scripts/01_eda.py.
+  earth_radius_m: 6371008.8
+
+preprocessing:
+  # A time gap larger than this splits a trajectory into independent segments.
+  # Context features never look across a segment boundary; the HMM should restart there.
+  gap_split_s: 30
+  # Window (in points, each side) used to estimate GPS heading.
+  heading_window: 2
+  # Below this displacement over the heading window, heading is treated as unreliable.
+  min_heading_disp_m: 3.0
+  # Window (points each side) for jitter features: straightness and window speed.
+  jitter_window: 3
+
+candidates:
+  # A road segment is a candidate for a GPS point if its perpendicular distance <= radius.
+  radius_m: 50.0
+  # Keep at most this many nearest candidates per point (both travel directions count separately).
+  max_candidates: 16
+  # Arc densification step for the spatial index.
+  index_step_m: 10.0
+
+labels:
+  # Points whose aligned reference arc is farther than this are flagged label_ok = 0
+  # (unreliable reference, typically inside GPS gaps). Keep or drop them, but be consistent.
+  max_label_dist_m: 50.0
+  # Per-point cost cap in the monotone route alignment (robust to off-route observations).
+  alignment_cap_m: 100.0
+  # Extra alignment cost (metres) for an arc pointing opposite to a reliable GPS heading.
+  # Kept at 0: EDA showed the "against-heading" labels are GPS jitter while stopped,
+  # not alignment errors, so labels are derived from route order + geometry only.
+  alignment_heading_weight_m: 0.0
+
+cv:
+  n_folds: 5
+  seed: 42

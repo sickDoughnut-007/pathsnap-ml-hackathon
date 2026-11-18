@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.DS_Store
+.env
+# raw dataset lives outside the repo (../Student folder); never commit evaluator data
+Student folder/
+*.tar.gz
+# model files over ~90 MB must not be committed (GitHub limit 100 MB)
