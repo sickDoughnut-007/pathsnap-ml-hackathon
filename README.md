@@ -43,7 +43,7 @@ python scripts/02_build_features.py
 python scripts/03_validate_dataset.py
 ```
 
-`data/processed/` is committed, so teammates can train straight away without rebuilding.
+Generate `data/processed/` locally with the feature-building script above. The [distance-weighted KNN experiment](models/distance_weighted_knn/README.md) uses these tables and includes its measured results and saved model.
 
 ## Training a model (for every team member)
 
