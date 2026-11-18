@@ -35,7 +35,10 @@ def model_comparison():
         ax.barh(y, values * 100, xerr=(err.values * 100 if err is not None else None),
                 color=["#087b76" if m == "Distance-weighted KNN" else "#8da0b2" for m in df.model])
         ax.set_yticks(y, df.model)
-        ax.set_xlim(85, 91)
+        ax.set_xlim(
+            82 if mean_col == "cv_top1_mean" or mean_col == "student_top1" else 91,
+            98 if mean_col == "cv_top1_mean" or mean_col == "student_top1" else 94,
+        )
         ax.set_xlabel("Score (%)")
         ax.set_title(title)
         ax.grid(axis="x", alpha=.25)
