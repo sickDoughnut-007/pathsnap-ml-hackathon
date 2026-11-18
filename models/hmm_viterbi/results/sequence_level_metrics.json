@@ -1,0 +1,21 @@
+{
+  "method": "Exact match over contiguous labelled GPS observation runs; runs shorter than 2 observations excluded.",
+  "models": {
+    "classifier_only": {
+      "number_of_sequences": 13,
+      "exact_sequence_matches": 0,
+      "exact_sequence_accuracy": 0.0,
+      "mean_sequence_point_accuracy": 0.9059482720068757,
+      "total_observations": 19133,
+      "failed_sequences": 13
+    },
+    "classifier_plus_hmm_viterbi": {
+      "number_of_sequences": 13,
+      "exact_sequence_matches": 0,
+      "exact_sequence_accuracy": 0.0,
+      "mean_sequence_point_accuracy": 0.9145562289085739,
+      "total_observations": 19133,
+      "failed_sequences": 13
+    }
+  }
+}
