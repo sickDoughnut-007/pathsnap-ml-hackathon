@@ -33,7 +33,7 @@ Invoke-WebRequest https://registry.npmjs.org/leaflet/-/leaflet-1.9.4.tgz -OutFil
 | 5. Build and scale features | Computed seven values per candidate: distance, log-transformed distance, heading agreement, a heading-available indicator, recent speed, log-transformed segment length, and distance to the nearer endpoint. Motion uses the current and preceding GPS points. The model pipeline fits its scaler only on eligible training rows. |
 | 6. Filter training rows and split by trip | Trained on observations whose estimated reference arc appeared among the candidates and lay within 30 m. Held out 16 whole trips and fitted on 64. Then refitted on all 80 training trips for the 10-trip student-test comparison. Every evaluation observation counts, including candidate misses. |
 
-The shared [processed trip files and loading example](https://github.com/sickDoughnut-007/pathsnap-ml-hackathon/tree/main#load-a-trip) contain the features before scaling so each model can fit its own preprocessing on its training fold. The exact partitions, archive digest, configuration, and timings for this experiment are in [the run record](results/metrics.json).
+This branch includes the [processed trip files](processed/) and a [loading example](PREPROCESSING.md#load-a-trip). The files contain the features before scaling so each model can fit its own preprocessing on its training fold. The exact partitions, archive digest, configuration, and timings for this experiment are in [the run record](results/metrics.json).
 
 ## Evaluation
 
