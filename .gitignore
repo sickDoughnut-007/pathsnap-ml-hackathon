@@ -9,3 +9,11 @@ venv/
 Student folder/
 *.tar.gz
 # model files over ~90 MB must not be committed (GitHub limit 100 MB)
+data/
+**/__pycache__/
+*.py[cod]
+*.db
+*.sqlite
+*.sqlite3
+*.log
+models/hmm_viterbi/results/*.html

@@ -10,3 +10,6 @@ joblib>=1.3
 # model-specific (install what your model needs)
 lightgbm>=4.0
 optuna>=3.4
+
+fastapi>=0.110
+uvicorn[standard]>=0.27
