@@ -33,7 +33,7 @@ def model_comparison():
         values = df[mean_col]
         err = df[std_col] if std_col else None
         ax.barh(y, values * 100, xerr=(err.values * 100 if err is not None else None),
-                color=["#087b76" if m == "Distance-weighted KNN" else "#8da0b2" for m in df.model])
+                color=["#087b76" if m.startswith("Distance-weighted KNN") else "#8da0b2" for m in df.model])
         ax.set_yticks(y, df.model)
         ax.set_xlim(
             82 if mean_col == "cv_top1_mean" or mean_col == "student_top1" else 91,
