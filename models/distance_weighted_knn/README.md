@@ -1,6 +1,6 @@
 # Distance-weighted KNN for PathSnap
 
-The [KNN sequence decoder](sequence/README.md) improved student-test road-selection accuracy from **87.57% to 96.26%**. The figures below describe the original pointwise KNN used to score each candidate.
+The original pointwise KNN selected the correct road at **87.57%** of eligible student-test readings. The first route decoder raised that to **96.26%** and the second reached **97.22%** using the same candidate scores. The figures below describe the pointwise classifier. [First decoder](sequence/README.md) · [Second decoder](sequence/iteration2/README.md) · [Team comparison scorecard](../../README.md#team-comparison-scorecard)
 
 [How the accuracy improved](../../README.md#why-road-selection-accuracy-rose-from-8757-to-9626) · [Original model, code and results in legacy](../../legacy/distance_weighted_knn/)
 

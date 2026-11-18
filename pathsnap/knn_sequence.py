@@ -106,12 +106,14 @@ class TripLattice:
         self.reverse = ((u[:-1, :, None] == v[1:, None, :]) &
                         (v[:-1, :, None] == u[1:, None, :]) & ~same)
 
-    def decode(self, cfg):
+    def decode(self, cfg, road_bonus=None):
         if not len(self.points):
             return np.empty(0, np.int32)
         emission = cfg.knn_strength * self.log_knn - self.dist / cfg.gps_scale
         if cfg.damp_jitter:
             emission *= self.motion_confidence[:, None]
+        if road_bonus is not None:
+            emission += road_bonus
         # A finite escape cost lets the sequence recover at incomplete road networks.
         penalty = np.minimum(self.error / cfg.transition_scale + self.reverse * cfg.turn_cost, cfg.escape_cost)
         if cfg.switch_cost:

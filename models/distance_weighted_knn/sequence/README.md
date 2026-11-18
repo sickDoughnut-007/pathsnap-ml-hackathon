@@ -1,5 +1,7 @@
 # Route decoding for distance-weighted KNN
 
+This page records the first decoder. The second iteration reached **97.22%** on the same student-test split by guiding road choices with more widely spaced GPS readings. [Second iteration and prediction command](iteration2/README.md)
+
 The decoder reached **96.26% road-selection accuracy** across the ten student-test trips. It matched the estimated reference arc at **18,417 of 19,133 eligible observations**, improving on pointwise KNN by **1,662 correct matches**. All ten trips improved. The weakest was trip 00000077 at 91.95% (3,596 of 3,911). The 95% target applies to the pooled score.
 
 | Measure | Pointwise KNN | KNN with route decoding |

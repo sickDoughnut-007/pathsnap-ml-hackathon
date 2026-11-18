@@ -1,6 +1,56 @@
-# PathSnap: Distributed Map-Matching & Route Reconstruction
+# PathSnap map matching with distance-weighted KNN
 
-UE24CS352A Machine Learning hackathon, PES University. The project matches noisy GPS observations to road segments. A candidate classifier scores the nearby segments, and HMM/Viterbi decoding then picks a connected route. The trained model is served through a FastAPI backend (Laptop 1) to an evaluator UI (Laptop 2).
+This branch contains the **distance-weighted KNN** experiment for the PES University machine learning hackathon. Given a noisy GPS track and a road map, KNN scores nearby directed road segments at each reading. A Viterbi decoder uses those scores and road connectivity to reconstruct the trip. **Observation top-1** measures how often the selected road and direction match the estimated reference arc.
+
+**Best result on this branch:** KNN with the second route decoder selected the correct directed road at **18,601 of 19,133 eligible student-test readings (97.22%)**. It reached **96.44%** mean top-1 across the five training folds used for selection. The reserved evaluator trips have yet to be scored.
+
+## Team comparison scorecard
+
+### Candidate classifier
+
+Both branches use the same 37 features, five whole-trip training folds and ten student-test trips. CV is the arithmetic mean of the five fold scores. Student-test results pool predictions across trips. Both models scored 169,408 eligible candidate rows. A positive candidate matches the estimated reference arc. Hard classification uses a probability threshold of 0.5.
+
+| Metric | KNN CV | LightGBM CV | KNN student test | LightGBM student test |
+| --- | ---: | ---: | ---: | ---: |
+| Candidate accuracy | 96.67% | 96.98% | 97.05% | 97.68% |
+| Macro precision | 0.9306 | 0.9383 | 0.9305 | 0.9479 |
+| Macro recall | 0.9164 | 0.9238 | 0.9204 | 0.9347 |
+| **Macro F1** | 0.9231 | 0.9307 | 0.9254 | 0.9412 |
+| Match-class precision | 0.8826 | 0.8963 | 0.8793 | 0.9110 |
+| Match-class recall | 0.8495 | 0.8626 | 0.8558 | 0.8804 |
+| Match-class F1 | 0.8653 | 0.8787 | 0.8674 | 0.8954 |
+| Log loss ↓ | 0.0987 | 0.0729 | 0.0870 | 0.0572 |
+| **Pointwise observation top-1** | 87.49% | 88.29% | 87.57% | 90.04% |
+| Candidate miss rate ↓ | 0.483% | 0.483% | 0.031% | 0.031% |
+
+Candidate accuracy counts correct binary decisions. Precision measures how many predicted matches are correct, recall measures how many actual matches are found, and F1 balances the two. Macro scores average the two classes equally. Log loss evaluates probabilities and penalizes confident errors. Observation top-1 compares the single highest-scoring road with the reference at each eligible GPS reading.
+
+LightGBM leads on pointwise student-test top-1 by 2.47 percentage points. Its published one-hop and two-hop continuity scores are 79.91% and 89.75% before route decoding. The team would need a decoded LightGBM run to compare full routes. The earlier logistic regression experiment used seven features and a single held-out set of 16 trips. It would need a run on the shared benchmark to enter this table. [Published LightGBM run](https://github.com/sickDoughnut-007/pathsnap-ml-hackathon/blob/3c212155e5bb32d5e8cc998c73ff1b2943d3e414/models/lightgbm/metrics.json) · [Earlier logistic regression experiment](https://github.com/sickDoughnut-007/pathsnap-ml-hackathon/blob/b58e69cefaf2a88fad358b8667a7e29144159221/README.md)
+
+Six of the 19,133 eligible student-test readings lacked the reference candidate and count as top-1 misses. Another 27 readings had unreliable references and are excluded by the shared evaluator. Most candidate rows describe other roads, so accuracy alone can hide mistakes on the matching-road class. The KNN student-test confusion matrix contains **16,369 true positives, 2,246 false positives, 2,758 false negatives and 148,035 true negatives**. Its fold-to-fold sample standard deviations were 0.0181 for macro F1 and 3.39 percentage points for pointwise top-1. [Machine-readable metrics](models/distance_weighted_knn/metrics.json) · [Fold results](models/distance_weighted_knn/cv_folds.csv)
+
+### Route quality
+
+| Metric | Pointwise KNN | First decoder | Second decoder |
+| --- | ---: | ---: | ---: |
+| Mean training-fold observation top-1 | 87.49% | 95.32% | 96.44% |
+| **Student-test observation top-1** | **87.57%** | **96.26%** | **97.22%** |
+| Student-test correct / eligible readings | 16,755 / 19,133 | 18,417 / 19,133 | 18,601 / 19,133 |
+| One-hop route continuity | 76.78% | 89.12% | 90.13% |
+| Two-hop route continuity | 87.43% | 97.68% | 98.37% |
+
+Continuity measures the fraction of **changes of predicted arc** within a GPS segment that the road graph connects in one or two hops. The decoder outputs a selected arc per reading. Candidate F1 and log loss come from the underlying KNN scores. Compare classifiers using pointwise top-1, candidate macro F1 and log loss. Compare complete pipelines using decoded top-1 and continuity on the same eligible readings. The folds used to select decoder settings can give optimistic results.
+
+### Compute cost
+
+| Measured stage | Distance-weighted KNN | LightGBM |
+| --- | ---: | ---: |
+| Final classifier fit on 80 trips | 3.20 s | 46.08 s |
+| Scoring per 1,000 student-test candidate rows | 101.81 ms | 8.28 ms |
+
+The KNN laptop has an Intel Core i5-1135G7 CPU. Its saved classifier occupies 42.30 MiB and used 1,479,905 rows for its final fit. The first decoder added 4.30 seconds for ten trips, excluding preprocessing, file loading and KNN scoring. The timings come from separate runs and hardware conditions may differ. [KNN training environment](models/distance_weighted_knn/README.md) · [First decoder timing](models/distance_weighted_knn/sequence/student_metrics.json) · [LightGBM timings](https://github.com/sickDoughnut-007/pathsnap-ml-hackathon/blob/3c212155e5bb32d5e8cc998c73ff1b2943d3e414/models/lightgbm/metrics.json)
+
+The second decoder's recorded wall time was 56.04 seconds across the ten trips, including 45.21 seconds on trip `00000007`. That single trip dominates the measurement, so the ratio between the two recorded times is a poor estimate of typical slowdown. [Per-trip timings](models/distance_weighted_knn/sequence/iteration2/student_trips.csv)
 
 ## Why road-selection accuracy rose from 87.57% to 96.26%
 
@@ -19,112 +69,14 @@ We selected the settings with the highest mean top-1 across the five training fo
 
 With settings fixed, accuracy improved on **all ten student-test trips**. Trip `00000077` went from **2,827 to 3,596** correct out of **3,911**, or **72.28% to 91.95%**. Across the ten trips, the share of predicted road changes connected within one network hop rose from **76.78% to 89.12%**. The **96.26%** result is pooled across eligible student-test readings. The reserved evaluator trips have yet to be scored. [Decoder, results and reproduction commands](models/distance_weighted_knn/sequence/README.md)
 
-## Repository layout
+## How the second decoder reached 97.22%
 
-```
-config.yaml                 shared settings (radius, K, gap threshold, CV seed) - do not change alone
-pathsnap/                   shared Python package
-  io.py                     read .track/.nodes/.arcs/.route, config
-  geo.py                    local projection (metres), bearings, point-to-segment distance
-  network.py                road graph: duplicate-arc canonicalisation, connectivity
-  preprocess.py             time ordering, gap segmentation, speed, heading, jitter indicators
-  candidates.py             KD-tree candidate generation (radius + top-K)
-  labels.py                 per-observation reference labels by monotone route alignment (DP)
-  features.py               37 location-independent features per (observation, candidate)
-  dataset.py                load the processed tables  <- use this in model code
-  evaluate.py               shared metrics             <- use this in model code
-scripts/
-  01_eda.py                 dataset exploration -> results/eda/
-  02_build_features.py      builds data/processed/ (the shared dataset)
-  03_validate_dataset.py    sanity checks + non-learned baselines -> results/preprocessing/
-models/_template_train.py   copy this for each model
-data/processed/             shared dataset (parquet) + folds.csv + feature_list.txt
-results/                    EDA tables, plots, Folium maps, quality reports
-```
+The first decoder can follow a plausible but incorrect road through a cluster of noisy readings. The second decoder first traces a route using readings at least 15 metres apart, plus each segment’s endpoints. It then scores every reading with the original decoder, giving extra weight to candidates on that coarse route and its short connecting roads. Every original candidate can still win. The fitted KNN and its candidate macro F1 stay the same.
 
-## Setup
+We tested the first decoder and 18 variants on out-of-fold training predictions. The selected settings improved all five folds. On the student test, six trips improved and four tied. Trip `00000077` gained the most matches, from **3,596 to 3,644 of 3,911**. At **97.22%**, this iteration is **150 correct matches short** of the 18,751 needed for 98%. The same ten student-test trips have been reported across iterations, so the team should use the reserved evaluator for its final performance claim. [Second decoder, fold results and prediction command](models/distance_weighted_knn/sequence/iteration2/README.md)
 
-```
-pip install -r requirements.txt
-```
+## Reproduce a team comparison
 
-The raw data is expected at `../Student folder/Student folder/{train,student_test}`, next to the repo, which is how the provided zip extracts. If yours is elsewhere, pass `--data-root PATH` or set `PATHSNAP_DATA_ROOT`. The raw data is not committed.
-
-## Rebuilding everything (about 1 minute)
-
-```
-python scripts/01_eda.py
-python scripts/02_build_features.py
-python scripts/03_validate_dataset.py
-```
-
-Generate `data/processed/` locally with the feature-building script above. The [distance-weighted KNN experiment](models/distance_weighted_knn/README.md) uses these tables and includes its measured results and saved model.
-
-## Training a model (for every team member)
-
-```
-mkdir models/<model_name>
-cp models/_template_train.py models/<model_name>/train.py
-# edit make_model() only
-python models/<model_name>/train.py
-```
-
-The template loads the shared tables, runs the fixed trip-level 5-fold CV, refits on all 80 training trips, scores the 10 student-testing trips, and writes `metrics.json`, `cv_folds.csv` and `model.joblib`.
-
-Rules:
-- Use `FEATURES` from `pathsnap.dataset`, the precomputed `fold` column, and the functions in `pathsnap/evaluate.py`. Never write your own split or metric.
-- Train on `model_rows(...)`, i.e. labelled observations only (`label_ok == 1`).
-- Pass `trip_weight` as the sample weight, so that the three 15k–19k-point trips don't dominate.
-- Do not use `class_weight="balanced"` on the model that feeds the HMM. It distorts the probabilities, and the HMM uses them as emission probabilities.
-- If a feature change is needed, change `pathsnap/` and rebuild. Then everyone retrains.
-
-## The shared dataset
-
-One row per (GPS observation, candidate road segment), labelled 1 if that segment is the observation's reference segment.
-
-| file | rows | content |
-|---|---|---|
-| `train_candidates_fold{0..4}.parquet` | 1.51 M | 80 training trips, split by CV fold (about 25 MB each, under the GitHub limit) |
-| `student_test_candidates.parquet` | 0.17 M | 10 student-testing trips |
-| `*_points.parquet` | 208 k / 19 k | one row per observation: reference arc, alignment distance, label_ok, candidate count |
-| `folds.csv` | 80 | trip to fold (seed 42, balanced by labelled observations) |
-
-Columns: `trip_id, point_idx, arc_id, <37 features>, label, label_ok, segment, t, fold, trip_weight`. About 12% of rows are positives.
-
-Feature groups (all in metres, seconds, degrees or counts, so they are independent of location):
-- **geometry:** perpendicular distance, distance relative to the nearest candidate, rank, number of candidates, projection position, overshoot past the segment end, segment length
-- **direction:** GPS heading compared with segment bearing (directed and undirected)
-- **kinematics:** speed, turn, time gaps, path straightness, window speed
-- **topology:** node degrees, two-way flag
-- **temporal context:** distance of neighbouring observations to the same segment, whether the segment is also a candidate for neighbouring observations, link to the neighbour's nearest segment, signed progress along the segment
-
-## Key preprocessing decisions (from EDA)
-
-The trips come from different places around the world (Europe, Russia, the Americas, Asia, Africa), and each has its own road network. Arc ids are local to a trip. So the task is framed as binary classification of candidate segments using location-independent features, not as prediction of arc ids.
-
-- **Distances:** a local equirectangular projection centred on each trip. The largest trip extent is about 75 km, giving a scale error of at most 0.8%, which is negligible for the GPS-to-road distances used here (under 50 m).
-- **Gaps:** a time gap over 30 s splits a trajectory into segments. Context features never cross a segment boundary, and the HMM should restart there. Gaps reach 42 h (trip 90), 14.7 h (trip 78) and 36 min (trip 21).
-- **Duplicate arcs:** 60 trips list some node pairs more than once. These are collapsed to the lowest arc id.
-- **Candidates:** every segment within 50 m, keeping the nearest 16 (both travel directions count separately; about 95% of streets are two-way). Candidate miss rate: 0.48% on train, 0.03% on student_test.
-- **Labels:** `.route` gives the ordered arcs but not which observation is on which arc. Each observation is assigned a route position by a monotone dynamic-programming alignment (positions never move backwards) that minimises total distance. Two refinements:
-  - each point's cost is capped at 100 m, so points far from the route can't pull the alignment;
-  - ties go to the earliest route position.
-
-  This settles two-way streets, U-turns and repeated passes, which plain "nearest arc" labelling gets wrong.
-- **Unreliable references:** observations more than 50 m from their aligned route arc get `label_ok = 0`. Some GPS tracks continue well past the end of their reference route: trip 54 (route 31 km, track 169 km, 11% labelled), trip 33 (41%), and trips 2, 43 and 66 (88–93%). This is a limitation of the reference data. These points are excluded from training and metrics but still get predictions.
-- **GPS jitter:** when the vehicle is stopped, GPS noise fakes speeds of 2–8 m/s and random headings. About 15% of correct labels at 2–8 m/s point against the computed heading for this reason, not because the labels are wrong. The features `straightness` and `speed_window` let models recognise it.
-
-## Reference numbers (`results/preprocessing/validation.json`)
-
-| | train | student_test |
-|---|---|---|
-| Top-1, nearest-segment rule | 55.7% | 54.1% |
-| Top-1, distance + heading rule | 83.7% | 83.9% |
-| Top-1, logistic regression (template default) | 88.3% (CV) | 88.6% |
-| Route continuity of the reference labels, 1 hop / 2 hops | 91.9% / 98.5% | 90.8% / 98.5% |
-
-The nearest-segment rule is near 50% because a two-way street has two arcs at exactly the same distance. The reference labels themselves are only 91–92% continuous at 1 hop, because 1 Hz sampling skips short segments. Report continuity at both 1 and 2 hops.
-
-## Data-leakage rules
-
-The pipeline uses only the 80 training trips for fitting and the 10 student-testing trips for comparison. Features never read `.route`; it is used only to make labels. At prediction time, load trips with `load_trip(..., with_route=False)` or `load_trip_dir()`. Evaluator trips must never be used for anything except the final demo.
+1. Build the local Parquet files from the student archive and use the supplied feature list, eligibility flags, weights and trip folds. [Shared pipeline and dataset guide](SHARED_PIPELINE.md)
+2. Fit preprocessing inside each training fold, then refit the selected classifier on all 80 training trips. Keep predictions, fit time and inference time with the measured scores. [Training template](models/_template_train.py) · [KNN source and exact environment](models/distance_weighted_knn/README.md)
+3. Score all ten student-test trips with the shared evaluator. Record the classifier and sequence-decoder results separately, including trip-level counts so difficult trips remain visible. [Shared evaluator](pathsnap/evaluate.py) · [Original pointwise experiment](legacy/distance_weighted_knn/) · [First sequence decoder](models/distance_weighted_knn/sequence/)
