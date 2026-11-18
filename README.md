@@ -2,7 +2,22 @@
 
 UE24CS352A Machine Learning hackathon, PES University. The project matches noisy GPS observations to road segments. A candidate classifier scores the nearby segments, and HMM/Viterbi decoding then picks a connected route. The trained model is served through a FastAPI backend (Laptop 1) to an evaluator UI (Laptop 2).
 
-This README currently covers the **shared data pipeline**: EDA, preprocessing, candidate generation, labels, features and evaluation. Every model in the team is trained on its output.
+## Why road-selection accuracy rose from 87.57% to 96.26%
+
+On the same ten student-test trips, pointwise KNN selected the estimated reference road at **16,755 of 19,133 eligible GPS readings**. KNN with route decoding matched **18,417 of 19,133**. That is **1,662 additional matches**, a gain of **8.69 percentage points**. Both runs used the same fitted KNN, the same 37-feature candidate tables, and the same reference labels. The improvement came from how the system chose a sequence of roads from the KNN scores. [Original model and results](legacy/distance_weighted_knn/) · [Per-trip comparison](models/distance_weighted_knn/sequence/student_trips.csv)
+
+The original model picked the highest-scoring road at each reading. On a two-way street, opposite directions can have exactly the same distance to the GPS point. When the vehicle slows down, GPS jitter can also make its estimated heading swing around. A pointwise choice can therefore reverse direction for one reading and switch back for the next. The decoder considers whether the vehicle could plausibly travel that sequence on the directed road network.
+
+| Change | Why it helps | Evidence from the five training folds |
+| --- | --- | --- |
+| Choose a sequence with Viterbi | Combine KNN scores and GPS distance with the road distance between successive choices. Penalize implausible travel and immediate reversals. | Mean top-1 rose from **87.49%** for pointwise KNN to **92.92%** in trial 10. |
+| Refine the timing of road changes | Once a route is predicted, use GPS distance to determine which reading crossed onto the next arc, while preserving route order. | Trials 11 and 15 differed only in this refinement. Accuracy rose from **93.19% to 94.01%**. |
+| Include short connecting roads | A vehicle can cross a short arc between readings. The alignment step can consider that connector when it belongs to a reading’s candidate set. | Enabling connectors in trial 21 raised trial 15’s **94.01% to 94.25%**. |
+| Reduce the influence of GPS jitter | At low movement speeds, give individual readings less influence over the route choice. | Trials 26 and 30 differed only in this setting. Accuracy rose from **94.78% to 95.27%**. |
+
+We selected the settings with the highest mean top-1 across the five training folds. Each trip’s KNN scores came from a fit that excluded that entire trip. The best of 38 configurations reached **95.32%** on those folds. The matched trial pairs above isolate individual changes at specific settings. Their gains depend on those settings and should not be added together. [All 38 trials](models/distance_weighted_knn/sequence/trials.csv) · [Selected settings](models/distance_weighted_knn/sequence/settings.json)
+
+With settings fixed, accuracy improved on **all ten student-test trips**. Trip `00000077` went from **2,827 to 3,596** correct out of **3,911**, or **72.28% to 91.95%**. Across the ten trips, the share of predicted road changes connected within one network hop rose from **76.78% to 89.12%**. The **96.26%** result is pooled across eligible student-test readings. The reserved evaluator trips have yet to be scored. [Decoder, results and reproduction commands](models/distance_weighted_knn/sequence/README.md)
 
 ## Repository layout
 

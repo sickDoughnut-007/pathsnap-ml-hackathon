@@ -2,6 +2,8 @@
 
 The [KNN sequence decoder](sequence/README.md) improved student-test road-selection accuracy from **87.57% to 96.26%**. The figures below describe the original pointwise KNN used to score each candidate.
 
+[How the accuracy improved](../../README.md#why-road-selection-accuracy-rose-from-8757-to-9626) · [Original model, code and results in legacy](../../legacy/distance_weighted_knn/)
+
 On the ten student-test trips, KNN selected the estimated reference arc for **16,755 of 19,133 eligible observations (87.57%)**. The distance-plus-heading rule scored 83.92% on the same laptop rebuild. Both use the shared candidate search, labels and observation-level evaluator from commit `269405e`.
 
 | Metric | Five-fold validation mean | Student test |
