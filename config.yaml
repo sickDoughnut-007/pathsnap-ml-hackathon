@@ -4,7 +4,7 @@
 
 data:
   # Relative to the repo root. Override with --data-root or env PATHSNAP_DATA_ROOT.
-  root: "../Student folder/Student folder"
+  root: "data/local_dataset"
   train_dir: train
   student_test_dir: student_test
 
