@@ -1,0 +1,49 @@
+{
+  "model": "random_forest",
+  "algorithm_family": "Ensemble (bagging)",
+  "config": {
+    "n_estimators": 100,
+    "max_depth": 20,
+    "min_samples_leaf": 5,
+    "max_features": "sqrt",
+    "n_jobs": -1,
+    "random_state": 42
+  },
+  "seed": 42,
+  "train_rows_per_fold": 60000,
+  "cv_top1_mean": 0.880230568435677,
+  "cv_top1_std": 0.032082725687669254,
+  "cv_f1_macro_mean": 0.9289105300984929,
+  "cv_f1_macro_std": 0.01799229710073991,
+  "cv_log_loss_mean": 0.07662960396703164,
+  "cv_train_top1_mean": 0.9084701383782653,
+  "train_seconds": 25.479904399999214,
+  "inference_ms_per_1000_rows": 2.7037040753695423,
+  "student_test": {
+    "top1_accuracy": 0.8884649558354675,
+    "top1_given_ref_in_candidates": 0.8887436607936425,
+    "candidate_miss_rate": 0.0003135943134897623,
+    "accuracy": 0.9745702682281828,
+    "precision_macro": 0.9449695455778313,
+    "recall_macro": 0.9258714705715996,
+    "f1_macro": 0.9351385848080018,
+    "precision_pos": 0.9072720277029627,
+    "recall_pos": 0.8629685784493125,
+    "f1_pos": 0.8845659163987138,
+    "log_loss": 0.06290160332001826,
+    "confusion_matrix": [
+      [
+        148594,
+        1687
+      ],
+      [
+        2621,
+        16506
+      ]
+    ],
+    "n_observations": 19133,
+    "n_candidate_rows": 169408,
+    "route_continuity_1hop": 0.7700623700623701,
+    "route_continuity_2hop": 0.8700623700623701
+  }
+}

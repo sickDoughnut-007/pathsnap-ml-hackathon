@@ -1,0 +1,10 @@
+{
+  "baseline_cv_top1": 0.8828912778028117,
+  "tuned_cv_top1": 0.8832545098602772,
+  "cv_change": 0.00036323205746546794,
+  "baseline_student_top1": 0.9004338054669943,
+  "tuned_student_top1": 0.9037265457586369,
+  "student_change": 0.003292740291642615,
+  "baseline_student_macro_f1": 0.9411724030262647,
+  "tuned_student_macro_f1": 0.9425210747154851
+}

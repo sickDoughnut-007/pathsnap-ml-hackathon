@@ -1,0 +1,21 @@
+{
+  "objective": "binary",
+  "max_depth": 8,
+  "n_estimators": 500,
+  "learning_rate": 0.058383027479300555,
+  "num_leaves": 30,
+  "min_child_samples": 50,
+  "subsample": 0.7587948587257435,
+  "colsample_bytree": 0.7135681866731614,
+  "reg_alpha": 0.01597302366130558,
+  "reg_lambda": 0.03586816498627549,
+  "max_bin": 127,
+  "min_split_gain": 0.10702599800807679,
+  "scale_pos_weight": 1.137121411624857,
+  "subsample_freq": 1,
+  "random_state": 42,
+  "n_jobs": -1,
+  "verbosity": -1,
+  "deterministic": true,
+  "force_col_wise": true
+}

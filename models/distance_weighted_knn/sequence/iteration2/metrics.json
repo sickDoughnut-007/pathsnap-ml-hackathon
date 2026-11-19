@@ -1,0 +1,8 @@
+{
+  "correct": 18601,
+  "eligible": 19133,
+  "top1": 0.9721946375372393,
+  "decoder_seconds": 56.039524699997855,
+  "continuity_1hop": 0.9012779552715655,
+  "continuity_2hop": 0.98370607028754
+}

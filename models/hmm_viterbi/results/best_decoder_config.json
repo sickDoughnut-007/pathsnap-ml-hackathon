@@ -1,0 +1,8 @@
+{
+  "weight": 1.0,
+  "sigma_m": 30.0,
+  "disconnected_penalty": 6.0,
+  "backward_penalty": 3.0,
+  "backward_tolerance_m": 5.0,
+  "error_cap": 8.0
+}

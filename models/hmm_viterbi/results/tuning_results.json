@@ -1,0 +1,62 @@
+[
+  {
+    "trial": 1,
+    "params": {
+      "weight": 0.5,
+      "sigma_m": 30.0,
+      "disconnected_penalty": 6.0,
+      "backward_penalty": 3.0,
+      "backward_tolerance_m": 5.0,
+      "error_cap": 8.0
+    },
+    "train_oof_top1": 0.8946280434160743,
+    "train_oof_continuity_1hop": 0.9875841106205815,
+    "train_oof_continuity_2hop": 0.9931721214948931,
+    "seconds": 492.35212564468384
+  },
+  {
+    "trial": 2,
+    "params": {
+      "weight": 1.0,
+      "sigma_m": 30.0,
+      "disconnected_penalty": 6.0,
+      "backward_penalty": 3.0,
+      "backward_tolerance_m": 5.0,
+      "error_cap": 8.0
+    },
+    "train_oof_top1": 0.8966574372426152,
+    "train_oof_continuity_1hop": 0.9872098596793103,
+    "train_oof_continuity_2hop": 0.9930704601542384,
+    "seconds": 476.7670862674713
+  },
+  {
+    "trial": 3,
+    "params": {
+      "weight": 1.0,
+      "sigma_m": 60.0,
+      "disconnected_penalty": 8.0,
+      "backward_penalty": 5.0,
+      "backward_tolerance_m": 5.0,
+      "error_cap": 8.0
+    },
+    "train_oof_top1": 0.8893062819454115,
+    "train_oof_continuity_1hop": 0.9910085540634082,
+    "train_oof_continuity_2hop": 0.9936537505616201,
+    "seconds": 461.2410943508148
+  },
+  {
+    "trial": 4,
+    "params": {
+      "weight": 2.0,
+      "sigma_m": 60.0,
+      "disconnected_penalty": 8.0,
+      "backward_penalty": 5.0,
+      "backward_tolerance_m": 5.0,
+      "error_cap": 8.0
+    },
+    "train_oof_top1": 0.8923017967691619,
+    "train_oof_continuity_1hop": 0.990405229802532,
+    "train_oof_continuity_2hop": 0.9934454296187305,
+    "seconds": 554.4040992259979
+  }
+]

@@ -1,0 +1,56 @@
+{
+  "model": "mlp",
+  "algorithm_family": "Neural network",
+  "config": {
+    "hidden_layer_sizes": [
+      64,
+      32
+    ],
+    "alpha": 0.0001,
+    "learning_rate_init": 0.001,
+    "batch_size": 512,
+    "max_epochs": 60,
+    "patience": 5,
+    "es_trip_frac": 0.1,
+    "seed": 42
+  },
+  "seed": 42,
+  "train_rows_per_fold": 80000,
+  "cv_top1_mean": 0.8832556878466253,
+  "cv_top1_std": 0.034205504213630764,
+  "cv_f1_macro_mean": 0.9293355278888283,
+  "cv_f1_macro_std": 0.019508925926697736,
+  "cv_log_loss_mean": 0.0772870648116354,
+  "cv_train_top1_mean": 0.9027024044360259,
+  "train_seconds": 25.04399569999987,
+  "inference_ms_per_1000_rows": 1.0217439554300776,
+  "student_test": {
+    "top1_accuracy": 0.8840746354466106,
+    "top1_given_ref_in_candidates": 0.8843519631933915,
+    "candidate_miss_rate": 0.0003135943134897623,
+    "accuracy": 0.9721913959199093,
+    "precision_macro": 0.9335803825843343,
+    "recall_macro": 0.9265382772229162,
+    "f1_macro": 0.9300202244511204,
+    "precision_pos": 0.8839761346686554,
+    "recall_pos": 0.8675694045067183,
+    "f1_pos": 0.875695928652471,
+    "log_loss": 0.06558893974851723,
+    "confusion_matrix": [
+      [
+        148103,
+        2178
+      ],
+      [
+        2533,
+        16594
+      ]
+    ],
+    "n_observations": 19133,
+    "n_candidate_rows": 169408,
+    "route_continuity_1hop": 0.8032066769163189,
+    "route_continuity_2hop": 0.8943553700856578
+  },
+  "epochs_run": 10,
+  "best_epoch": 5
+}
