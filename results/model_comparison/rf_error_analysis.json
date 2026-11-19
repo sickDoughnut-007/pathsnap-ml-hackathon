@@ -1,0 +1,15 @@
+{
+  "oof_top1_accuracy": 0.8801578177539576,
+  "oof_top2_accuracy": 0.9627152857613195,
+  "oof_top3_accuracy": 0.976877863955051,
+  "n_labelled_observations": 185277,
+  "n_top1_errors_with_ref_in_candidates": 21307,
+  "error_share_opposite_direction_same_street": 0.45135401511240436,
+  "error_share_adjacent_segment_at_boundary": 0.35124606936687475,
+  "error_share_other": 0.1973999155207209,
+  "error_share_vehicle_slow_lt_2mps": 0.5363026235509457,
+  "definitions": {
+    "opposite_direction_same_street": "predicted and reference arcs have equal perpendicular distance and length (reverse arc of a two-way street)",
+    "adjacent_segment_at_boundary": "otherwise, the observation projects within 10% of an end of either arc"
+  }
+}

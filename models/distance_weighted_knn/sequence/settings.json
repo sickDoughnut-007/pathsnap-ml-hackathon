@@ -1,0 +1,11 @@
+{
+  "gps_scale": 4,
+  "transition_scale": 15,
+  "turn_cost": 35,
+  "knn_strength": 0.4,
+  "switch_cost": 1.5,
+  "realign": true,
+  "bridge": true,
+  "escape_cost": 250,
+  "damp_jitter": true
+}

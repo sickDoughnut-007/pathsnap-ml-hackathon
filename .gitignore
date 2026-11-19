@@ -1,19 +1,37 @@
+﻿# Python
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Virtual environments
 .venv/
 venv/
-.ipynb_checkpoints/
-.DS_Store
+env/
+
+# Secrets
 .env
-# raw dataset lives outside the repo (../Student folder); never commit evaluator data
-Student folder/
-*.tar.gz
-# model files over ~90 MB must not be committed (GitHub limit 100 MB)
-data/
-**/__pycache__/
-*.py[cod]
+.env.*
+!.env.example
+
+# Local datasets: retain documentation
+!data/
+data/*
+!data/README.md
+
+# Local databases and temporary files
 *.db
 *.sqlite
 *.sqlite3
-*.log
+*.tmp
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Generated HMM HTML; retain its generator and result data
 models/hmm_viterbi/results/*.html
